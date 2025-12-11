@@ -33,9 +33,14 @@ on:
         type: boolean
         required: true
         default: false
+        
+      file:
+        description: 'Path to file (example: youtube.ipa or opentube.zip)'
+        required: true
+        type: string        
 
       ipa_url:
-        description: "URL to the decrypted IPA file"
+        description: "URL to the decrypted IPA or ZIP file "
         default: ""
         required: true
         type: string
@@ -89,12 +94,21 @@ jobs:
 
       - name: Download and validate IPA
         run: |
+          # Download the IPA file
           wget "${{ inputs.ipa_url }}" --no-verbose -O ${{ github.workspace }}/youtube.ipa
 
+          # Check the MIME type of the downloaded file
           file_type=$(file --mime-type -b ${{ github.workspace }}/youtube.ipa)
 
+          # If it's a ZIP, unzip it?
+          if [[ "$file_type" == "application/zip" ]]; then
+            echo "Unzipping the file..."
+            unzip -o ${{ github.workspace }}/youtube.ipa -d ${{ github.workspace }}/unzipped
+          fi
+
+          # If the file is neither IPA nor ZIP, fail the workflow 
           if [[ "$file_type" != "application/x-ios-app" && "$file_type" != "application/zip" ]]; then
-            echo "::error::Validation failed: The downloaded file is not a valid IPA. Detected type: $file_type."
+            echo "::error::Invalid file type: $file_type"
             exit 1
           fi
 
