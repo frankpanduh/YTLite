@@ -33,11 +33,7 @@ on:
         type: boolean
         required: true
         default: false
-        
-      file:
-        description: 'Path to file (example: youtube.ipa or opentube.zip)'
-        required: true
-        type: string        
+              
 
       ipa_url:
         description: "URL to the decrypted IPA or ZIP file "
